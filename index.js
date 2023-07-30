@@ -1,18 +1,18 @@
+const fs = require('fs');
 const core = require('@actions/core');
-const wait = require('./wait');
 
-
-// most @actions toolkit packages have async methods
 async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    // Get the Terraform output from the action input
+    const tfOutput = core.getInput('tf_output', { required: true });
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    // log the output
+    console.log(`Terraform output: ${tfOutput}`);
 
-    core.setOutput('time', new Date().toTimeString());
+    // Write the content into the hosts.cfg file
+    fs.writeFileSync('hosts.cfg', tfOutput);
+
+    console.log('hosts.cfg file has been created successfully.');
   } catch (error) {
     core.setFailed(error.message);
   }
